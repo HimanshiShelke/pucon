@@ -2,10 +2,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:pucon/function.dart';
+//import 'package:pucon/function.dart';
 
 import 'package:http/http.dart' as http;
-import 'package:pucon/insert.dart';
+import 'package:http/http.dart';
+import 'package:wed_planner/components.dart';
+import 'package:wed_planner/vendor/venues/vinsert.dart';
 
 
 Future<List<Data>> fetchData() async {
@@ -23,6 +25,7 @@ Future<List<Data>> fetchData() async {
 
 class Data {
   Data ({
+    required this.venue_id,
     required this.venuename,
     required this.venuetype,
     required this.venueaddress,
@@ -30,6 +33,7 @@ class Data {
   });
 
   String venuename;
+  int venue_id;
   String venuetype;
   String venueaddress;
   String venuecontact;
@@ -39,7 +43,7 @@ class Data {
 
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-    //venue_id : json["venue_id"],
+    venue_id : json["venue_id"],
     venuename : json["venuename"],
     venuetype : json["venuetype"],
     venueaddress : json["venueaddress"],
@@ -53,7 +57,7 @@ class Data {
 
   Map<String, dynamic> toJson() => {
 
-    //"venue_id" : venue_id,
+    "venue_id" : venue_id,
     "venuename" : venuename,
     "venuetype" : venuetype,
     "venueaddress" : venueaddress,
@@ -65,6 +69,25 @@ class Data {
 
   };
 }
+
+
+Future deletePost(String url,int vid) async {
+  var headers = {'Content-Type': 'application/json'};
+
+  return http
+      .post(Uri.parse(url), body: json.encode(vid), headers: headers)
+      .then((http.Response response) {
+    final int statusCode = response.statusCode;
+
+    if (statusCode < 200 || statusCode > 400 || json == null) {
+      throw new Exception("Error while fetching data");
+    }
+    var body = response.body;
+    return Post.fromJson(json.decode(body));
+  });
+}
+
+
 
 
 class Venue extends StatefulWidget {
@@ -91,7 +114,7 @@ class _VenueState extends State<Venue> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) =>InsertData()),);
-        }, icon: Icon(Icons.add)),
+      }, icon: Icon(Icons.add)),
       ),
       body: Center(
         child: FutureBuilder<List<Data>>(
@@ -100,15 +123,26 @@ class _VenueState extends State<Venue> {
             if (snapshot.hasData) {
               List<Data> data = snapshot.data;
               return ListView.builder(
+                  scrollDirection: Axis.vertical,
                   itemCount: data.length,
                   itemBuilder: (BuildContext context, int index) {
                     return ListTile(
-                      leading: Icon(Icons.person),
                       title: Text(data[index].venuename),
-                      subtitle: Column(
+                      subtitle: Row(
                         children: [
-                          Text(data[index].venueaddress),
-                          Text(data[index].venuetype),
+                          Column(
+                            children: [
+                              /*Text(data[index].venueaddress),*/
+                              Text(data[index].venuetype),
+                              Text(data[index].venue_id.toString()),
+                            ],
+                          ),
+                          IconButton(onPressed: (){}, icon: Icon(Icons.update_sharp)),
+                          IconButton(onPressed: (){
+                            int vid = data[index].venue_id;
+                            deletePost('http://10.0.2.2:5000/deletevenue', vid);
+                            Navigator.push(context , MaterialPageRoute(builder: (context) => AddComponents()),);
+                          }, icon: Icon(Icons.delete)),
                         ],
                       ),
                       onTap: (){},
