@@ -138,7 +138,7 @@ class _VenueState extends State<Venue> {
                             ],
                           ),
                           IconButton(onPressed: (){}, icon: Icon(Icons.update_sharp)),
-                          IconButton(onPressed: (){
+                          IconButton(onPressed: () async {
                             int vid = data[index].venue_id;
                             deletePost('http://10.0.2.2:5000/deletevenue', vid);
                             Navigator.push(context , MaterialPageRoute(builder: (context) => AddComponents()),);
