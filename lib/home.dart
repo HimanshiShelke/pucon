@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:wed_planner/components.dart';
-import 'package:wed_planner/vendor/venues/vinsert.dart';
+import 'package:pucon/insert.dart';
+
 
 
 Future<List<Data>> fetchData() async {
@@ -113,7 +113,7 @@ class _VenueState extends State<Venue> {
       appBar: AppBar(title: Text('venue'),leading: IconButton(onPressed: (){
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) =>InsertData()),);
+          MaterialPageRoute(builder: (context) => InsertData()),);
       }, icon: Icon(Icons.add)),
       ),
       body: Center(
@@ -138,10 +138,10 @@ class _VenueState extends State<Venue> {
                             ],
                           ),
                           IconButton(onPressed: (){}, icon: Icon(Icons.update_sharp)),
-                          IconButton(onPressed: () async {
+                          IconButton(onPressed: () async{
                             int vid = data[index].venue_id;
                             deletePost('http://10.0.2.2:5000/deletevenue', vid);
-                            Navigator.push(context , MaterialPageRoute(builder: (context) => AddComponents()),);
+                            //Navigator.push(context , MaterialPageRoute(builder: (context) => AddComponents()),);
                           }, icon: Icon(Icons.delete)),
                         ],
                       ),
